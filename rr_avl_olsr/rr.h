@@ -15,7 +15,6 @@ typedef struct avl_node heap_node;
 
 typedef struct vtx_node{
     int cost, key;                      // cost = custo mínimo no caminho mínimo | key = nome do vértice
-    char mark;
 } vtx_node;                                 // primeiramente usar um vetor
 
 typedef struct edge {
