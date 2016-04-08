@@ -1,9 +1,9 @@
-/* Alone*/
-
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <string.h>
+#include "avl.h"
 #include "rr.h"
+
 
 /************************************************************************************************
 *************************************************************************************************
@@ -16,11 +16,11 @@ void rr_recalculate_shortest_path(vertex *graph, heap *queue)
 	if(!graph)
 		return;
 
-	node * min = NULL;
+	heap_node * min = NULL;
 	edge * edge_aux, * edge_p;
 	int pos;
 
-	while(queue->control)
+	while(!heap_is_empty(queue))
 	{
 		min = heap_extract(queue);
 		if(!min) return;
@@ -34,21 +34,21 @@ void rr_recalculate_shortest_path(vertex *graph, heap *queue)
 
 		while(edge_aux)
 		{
-			if(((node *)(graph + edge_aux->head_vertex))->mark == 1)
+			if(((vtx_node *)(graph + edge_aux->head_vertex))->mark == 1)
 			{
-				if(graph[edge_aux->head_vertex].heap_node.cost > min->cost + edge_aux->cost )									//relax();
-					heap_update((graph + edge_aux->head_vertex), min->key, min->cost + edge_aux->cost, queue);
+				if(((vtx_node*)graph[edge_aux->head_vertex].h_node.key)->cost > ((vtx_node*)min->key)->cost + edge_aux->cost )									//relax();
+					heap_update((graph + edge_aux->head_vertex), ((vtx_node*)min->key)->key, ((vtx_node*)min->key)->cost + edge_aux->cost, queue);
 			}
 			else
 			{
-				if(graph[edge_aux->head_vertex].heap_node.cost > min->cost + edge_aux->cost)
+				if(((vtx_node*)graph[edge_aux->head_vertex].h_node.key)->cost > ((vtx_node*)min->key)->cost + edge_aux->cost)
 				{
 					edge_p = find_edge_pred(graph+edge_aux->head_vertex, graph[edge_aux->head_vertex].pi);
 					if(edge_p) edge_p->hot_line = 0;
 
-					graph[edge_aux->head_vertex].heap_node.cost = min->cost + edge_aux->cost;
-					graph[edge_aux->head_vertex].pi = min->key;
-					if(heap_insert((node *) &graph[edge_aux->head_vertex], queue))
+					((vtx_node*)graph[edge_aux->head_vertex].h_node.key)->cost = ((vtx_node*)min->key)->cost + edge_aux->cost;
+					graph[edge_aux->head_vertex].pi = ((vtx_node*)min->key)->key;
+					if(heap_insert((heap_node *) &graph[edge_aux->head_vertex], queue))
 						printf("No %d nao inserido\n", edge_aux->head_vertex);
 				}
 			}
@@ -64,9 +64,9 @@ void rr_add_edge(vertex *graph, int tail, int head, int cost){
 
 	edge * edge_added = g_insert_edge(graph, tail, head, cost);
 
-	int new_cost = graph[tail].heap_node.cost + edge_added->cost;
+	int new_cost = ((vtx_node*)graph[tail].h_node.key)->cost + edge_added->cost;
 
-	if (graph[head].heap_node.cost <= new_cost)
+	if (((vtx_node*)graph[head].h_node.key)->cost <= new_cost)
 		return;
 
 	heap * queue = heap_new();
@@ -76,11 +76,11 @@ void rr_add_edge(vertex *graph, int tail, int head, int cost){
 	edge_added = find_edge_pred(graph+head, graph[head].pi);
 	if(edge_added)
 		edge_added->hot_line = 0;
-	graph[head].heap_node.cost = new_cost;
+	((vtx_node*)graph[head].h_node.key)->cost = new_cost;
 	graph[head].pi = tail;
 
-	if(heap_insert((node *)(graph + head), queue))
-		printf("No %d nao inserido\n", graph[head].heap_node.key);
+	if(heap_insert((heap_node *)(graph + head), queue))
+		printf("No %d nao inserido\n", ((vtx_node*)graph[head].h_node.key)->key);
 
 	rr_recalculate_shortest_path(graph, queue);
 
@@ -122,20 +122,20 @@ head_list *rr_mark_affected(vertex *graph, edge *edge_marked)
 {
 	if(!graph || !edge_marked) return NULL;
 
-	head_list * aux_list = list_new();
-	head_list * affected_list = list_new();
+	head_list * aux_list = list_vtx_new();
+	head_list * affected_list = list_vtx_new();
 
-	graph[edge_marked->head_vertex].heap_node.cost = INT_MAX;
+	((vtx_node*)graph[edge_marked->head_vertex].h_node.key)->cost = INT_MAX;
 	graph[edge_marked->head_vertex].pi = -3;
-	list_insert(aux_list, graph+edge_marked->head_vertex);
+	list_vtx_insert(aux_list, graph+edge_marked->head_vertex);
 
 	vertex * vtx;
 	edge * edge_aux;
 	while (aux_list->first)
 	{
-		vtx = list_remove(aux_list);
+		vtx = list_vtx_remove(aux_list);
 
-		list_insert(affected_list, vtx);
+		list_vtx_insert(affected_list, vtx);
 
 		edge_aux = vtx->adjacent;
 		while(edge_aux)
@@ -143,10 +143,10 @@ head_list *rr_mark_affected(vertex *graph, edge *edge_marked)
 			if(edge_aux->hot_line)
 			{
 				edge_aux->hot_line = 0;
-				graph[edge_aux->head_vertex].heap_node.cost = INT_MAX;
+				((vtx_node*)graph[edge_aux->head_vertex].h_node.key)->cost = INT_MAX;
 				graph[edge_aux->head_vertex].pi = -3;					// -3 indica que o nó foi afetado e está na lista
 
-				list_insert(aux_list, graph+edge_aux->head_vertex);
+				list_vtx_insert(aux_list, graph+edge_aux->head_vertex);
 //				break;
 			}
 
@@ -165,22 +165,22 @@ void rr_estimate_new_pi(vertex *graph, head_list *affected_list, heap *queue)
 	edge * edge_aux;
 	while(affected_list->first)
 	{
-		vtx = list_remove(affected_list);
+		vtx = list_vtx_remove(affected_list);
 		edge_aux = vtx -> predecessor;
 		while (edge_aux)
 		{
 			if((graph+edge_aux->tail_vertex)->pi != -3)							// -3 indica que o nó foi afetado e está na lista
 			{
-				if(vtx->heap_node.cost > graph[edge_aux->tail_vertex].heap_node.cost + edge_aux->cost )
+				if(((vtx_node*)vtx->h_node.key)->cost > ((vtx_node*)graph[edge_aux->tail_vertex].h_node.key)->cost + edge_aux->cost )
 				{
-					vtx->heap_node.cost = graph[edge_aux->tail_vertex].heap_node.cost + edge_aux->cost;
+					((vtx_node*)vtx->h_node.key)->cost = ((vtx_node*)graph[edge_aux->tail_vertex].h_node.key)->cost + edge_aux->cost;
 					vtx->pi = edge_aux->tail_vertex;
 				}
 			}
 			edge_aux = edge_aux->next_pred;
 		}
-		if(vtx->heap_node.cost < INT_MAX)
-			heap_insert((node *)vtx, queue);
+		if(((vtx_node*)vtx->h_node.key)->cost < INT_MAX)
+			heap_insert((heap_node *)vtx, queue);
 	}
 
 	return;
@@ -205,7 +205,7 @@ edge ** find_pointer_edge_adj(vertex *tail, edge *edge_ref)
 		{
 			break;
 		}
-		else if(edge_p->!next_adj)
+		else if(edge_p->next_adj)
 		{
 			return NULL;
 		}
@@ -279,8 +279,6 @@ edge * find_edge_pred(vertex * head, int key)
 
 	return edge_pred;
 }
-
-
 /************************************************************************************************
 *************************************************************************************************
 ****************************** ALGORITMOS DE MANIPULAÇÃO DO GRAFO *******************************
@@ -292,7 +290,7 @@ void g_free_graph(vertex **graph, int size)
 	if(!(*graph) || size < 1) return;
 	int i;
 	edge * edge_aux;
-    void * node;
+    heap_node * node;
 
 	for (i = 0; i < size; i++)
 	{
@@ -304,7 +302,7 @@ void g_free_graph(vertex **graph, int size)
 			edge_aux = (*graph)[i].adjacent;
 		}
 
-        node = &(*graph)[i].h_node.key;
+        node = (heap_node *)((*graph)[i].h_node.key);
         free(node);
 	}
 	free(*graph);
@@ -344,7 +342,7 @@ void g_print_graph(vertex *graph, int size)
 	for(i = 0; i < size; ++i)
 	{
 		edge_aux = graph[i].adjacent;
-		printf("Vertice\t\t%d\npi:\t\t%d\ncost:\t\t%d\narestas:\t", i, graph[i].pi, graph[i].heap_node.cost);
+		printf("Vertice\t\t%d\npi:\t\t%d\ncost:\t\t%d\narestas:\t", i, graph[i].pi, ((vtx_node*)graph[i].h_node.key)->cost);
 
 		while(edge_aux)
 		{
@@ -382,6 +380,7 @@ edge * g_insert_edge(vertex *graph, int tail, int head, int cost)
 	return edge_added;
 
 }
+
 
 /************************************************************************************************
 *************************************************************************************************
@@ -461,19 +460,18 @@ cmp_key(const void *p1, const void *p2) {
   return memcmp(&(ss1->cost), &(ss2->cost), sizeof(ss1->cost));
 }
 
-
 /************************************************************************************************
 *************************************************************************************************
 ****************************** ALGORITMOS DE MANIPULAÇÃO DE LISTA *******************************
 *************************************************************************************************
 ************************************************************************************************/
 
-head_list * list_new()
+head_list * list_vtx_new()
 {
 	return (head_list *) calloc(1, sizeof(head_list));
 }
 
-list * list_insert(head_list * h_list, vertex * v_list)
+list * list_vtx_insert(head_list * h_list, vertex * v_list)
 {
 	if(!h_list || !v_list) return NULL;
 
@@ -490,7 +488,7 @@ list * list_insert(head_list * h_list, vertex * v_list)
 	return l;
 }
 
-vertex * list_remove(head_list * h_list)
+vertex * list_vtx_remove(head_list * h_list)
 {
 	if(!h_list) return NULL;
 	if(!h_list->first) return NULL;

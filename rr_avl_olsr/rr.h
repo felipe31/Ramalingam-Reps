@@ -83,22 +83,18 @@ edge * g_insert_edge(vertex *graph, int tail, int head, int cost);
 
 heap * heap_new();
 
-node * heap_extract(heap * queue);
-
-int heap_checks_presence(node * heap_node, heap * queue);  // Retorna 0 se o nó não pertence ao heap, -1 caso haja erros e retorna a posição caso o nó pertença ao heap
+heap_node * heap_extract(heap * queue);
 
 void heap_update(vertex * vtx, int new_pi, int new_cost, heap * queue);
 
-int heap_insert(node * node_to_insert, heap * queue);       // Retorna 0 se o nó foi inserido com sucesso no heap e 1 caso contrário
-
-void heapfy(heap * queue, int i);
-
-void heap_build(heap * queue);
+int heap_insert(heap_node * node_to_insert, heap * queue);       // Retorna 0 se o nó foi inserido com sucesso no heap e 1 caso contrário
 
 void heap_print(heap * queue);
 
-int
-cmp_key(const void *p1, const void *p2);
+int cmp_key(const void *p1, const void *p2);
+
+#define heap_is_empty(queue) \
+    avl_is_empty(queue)
 
 /************************************************************************************************
 *************************************************************************************************
@@ -106,11 +102,11 @@ cmp_key(const void *p1, const void *p2);
 *************************************************************************************************
 ************************************************************************************************/
 
-head_list * list_new();
+head_list * list_vtx_new();
 
-list * list_insert(head_list * h_list, vertex * v_list);
+list * list_vtx_insert(head_list * h_list, vertex * v_list);
 
-vertex * list_remove(head_list * h_list);
+vertex * list_vtx_remove(head_list * h_list);
 
 
 #endif
