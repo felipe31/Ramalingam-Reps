@@ -47,7 +47,7 @@
 #define CONTAINER_OF_H_
 
 #include <stddef.h>
-#include "common/common_types.h"
+#include "common_types.h"
 
 #ifndef typeof
 /*! map typeof macro to builtin typeof */
@@ -62,6 +62,7 @@
  * @param member name of node inside struct
  * @return pointer to surrounding struct
  */
+  // list_entity * __tempptr = (ptr);
 #define container_of(ptr, type, member) ({ \
     const typeof(((type *)0)->member ) *__tempptr = (ptr); \
     (type *)((uint8_t *)__tempptr - offsetof(type,member)); \

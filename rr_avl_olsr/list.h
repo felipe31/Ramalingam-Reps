@@ -48,8 +48,8 @@
 
 #include <stddef.h>
 
-#include "common/container_of.h"
-#include "common/common_types.h"
+#include "container_of.h"
+#include "common_types.h"
 
 /**
  * this struct is used as list head and list elements.
@@ -269,7 +269,7 @@ list_merge(struct list_entity *add_to, struct list_entity *remove_from) {
  *    (automatically converted to type 'element')
  */
 #define list_prev_element(element, list_member) \
-  container_of((&(element)->list_member)->prev, typeof(*(element)), list_member)
+  ontainer_of((&(element)->list_member)->prev, typeof(*(element)), list_member)
 
 /**
  * Loop over a block of elements of a list, used similar to a for() command.

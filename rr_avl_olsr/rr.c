@@ -11,7 +11,6 @@
 *************************************************************************************************
 ************************************************************************************************/
 
-
 void rr_recalculate_shortest_path(vertex *graph, heap *queue)
 {
 	if(!graph)
@@ -206,7 +205,7 @@ edge ** find_pointer_edge_adj(vertex *tail, edge *edge_ref)
 		{
 			break;
 		}
-		else if(edge_p->next_adj == NULL)
+		else if(edge_p->!next_adj)
 		{
 			return NULL;
 		}
@@ -221,7 +220,7 @@ edge ** find_pointer_edge_pred(vertex *head, edge *edge_ref)
 {
 	edge * edge_p = head->predecessor;
 
-	if(edge_p == NULL)
+	if(!edge_p)
 		return NULL;
 
 	if(edge_p == edge_ref)
@@ -233,7 +232,7 @@ edge ** find_pointer_edge_pred(vertex *head, edge *edge_ref)
 		{
 			break;
 		}
-		else if(edge_p->next_pred == NULL)
+		else if(!edge_p->next_pred)
 		{
 			return NULL;
 		}
@@ -249,14 +248,14 @@ edge * find_edge_adj(vertex * tail, int key)
 {
 	edge * edge_adj = tail->adjacent;
 
-	if(edge_adj == NULL)
+	if(!edge_adj)
 		return NULL;
 
 	while(edge_adj->head_vertex != key)
 	{
 		edge_adj = edge_adj->next_adj;
 
-		if(edge_adj == NULL)
+		if(!edge_adj)
 			return NULL;
 	}
 
@@ -267,14 +266,14 @@ edge * find_edge_pred(vertex * head, int key)
 {
 	edge * edge_pred = head->predecessor;
 
-	if(edge_pred == NULL || key == -1)
+	if(!edge_pred || key == -1)
 		return NULL;
 
 	while(edge_pred->tail_vertex != key)
 	{
 		edge_pred = edge_pred->next_pred;
 
-		if(edge_pred == NULL)
+		if(!edge_pred)
 			return NULL;
 	}
 
@@ -293,6 +292,7 @@ void g_free_graph(vertex **graph, int size)
 	if(!(*graph) || size < 1) return;
 	int i;
 	edge * edge_aux;
+    void * node;
 
 	for (i = 0; i < size; i++)
 	{
@@ -303,6 +303,9 @@ void g_free_graph(vertex **graph, int size)
 			free(edge_aux);
 			edge_aux = (*graph)[i].adjacent;
 		}
+
+        node = &(*graph)[i].h_node.key;
+        free(node);
 	}
 	free(*graph);
 	*graph = NULL;
@@ -317,15 +320,16 @@ vertex *g_create_graph(int size)
 
 	for (; size > 0; --size)
 	{
-		graph[size-1].heap_node.key = size-1;
-		graph[size-1].heap_node.cost = INT_MAX;
+		graph[size-1].h_node.key = calloc(1, sizeof(vtx_node));
+        if(!graph[size-1].h_node.key) return NULL;
+        ((vtx_node*)graph[size-1].h_node.key)->key = size-1;
+		((vtx_node*)graph[size-1].h_node.key)->cost = INT_MAX;
 		graph[size-1].pi = -1;
 
 	}
 
 	return graph;
 }
-
 void g_print_graph(vertex *graph, int size)
 {
 
@@ -379,7 +383,6 @@ edge * g_insert_edge(vertex *graph, int tail, int head, int cost)
 
 }
 
-
 /************************************************************************************************
 *************************************************************************************************
 ****************************** ALGORITMOS DE MANIPULAÇÃO DO HEAP *******************************
@@ -388,80 +391,74 @@ edge * g_insert_edge(vertex *graph, int tail, int head, int cost)
 
 heap * heap_new()
 {
-	static struct avl_tree _routing_tree = (avl_tree *) calloc(1, sizeof(avl_tree));
+	struct avl_tree * _routing_tree = (struct avl_tree *) calloc(1, sizeof(struct avl_tree));
 
-	if(_routing_tree == NULL) return NULL;
+	if(!_routing_tree) return NULL;
 
-	avl_init( &_routing_tree, os_routing_avl_cmp_route_key, false);
-	return new_heap;
+	avl_init(_routing_tree, cmp_key, false);
+	return _routing_tree;
 }
 
 
-int heap_insert(node * node_to_insert, heap * queue)       // Retorna 0 se o nó foi inserido com sucesso no heap e -1 caso contrário
+int heap_insert(heap_node * node_to_insert, heap * queue)       // Retorna 0 se o nó foi inserido com sucesso no heap e -1 caso contrário
 {
 	if(!queue || !node_to_insert) return -1;
-	if(queue->control == HEAP_SIZE) return -1;
 
-	int avl_insert(struct avl_tree *, struct avl_node *);
+	avl_insert(queue, node_to_insert);
 	return 0;
 }
 
-node * heap_extract(heap * queue)
+
+heap_node * heap_extract(heap * queue)
 {
 	if(!queue) return NULL;
 
-	node * extracted = queue->node_vector[0];
-	queue->control--;
-	if(queue->control > 0)
-	{
-		queue->node_vector[0] = queue->node_vector[queue->control];
-		heapfy(queue, 0);
-	}
+    vertex *vtx;
+    vtx = (vertex *) avl_first_element_safe(queue, vtx, h_node);
 
-	extracted->mark = 0;
-	return extracted;
+    if(!vtx) return NULL;
+
+    avl_remove(queue, &(vtx->h_node));
+
+	return &(vtx->h_node);
 }
+
 
 void heap_update(vertex * vtx, int new_pi, int new_cost, heap * queue)
 {
-	vtx->pi = new_pi;
-	vtx->heap_node.cost = new_cost;
-	heap_build(queue);
+    avl_remove(queue, &(vtx->h_node));
+    vtx->pi = new_pi;
+    ((vtx_node *)vtx->h_node.key)->cost = new_cost;
+    avl_insert(queue, &(vtx->h_node));
 }
-
-int heap_checks_presence(node * heap_node, heap * queue)  	// Retorna 0 se o nó não pertence ao heap,
-{															// -1 caso haja erros e retorna a posição caso o nó pertença ao heap
-	if(!queue || !heap_node) return -1;
-
-	node ** vector = queue->node_vector;
-	int i;
-
-	for (i = 0; i < queue->control; ++i)
-	{
-		if(vector[i] == heap_node)
-			return i;
-	}
-	return 0;
-}
-
 
 void heap_print(heap * queue)
 {
-	int i;
-	if(!queue)
-		printf("Heap invalido\n");
-	else if(queue->control)
-	{
-		for ( i = 0; i < queue->control; i++)
-		{
-			printf("Elemento %d:\ncost:\t%d\npi:\t%d\nkey:\t%d\n\n", i, (queue->node_vector[i])->cost, ((vertex *)(queue->node_vector[i]))->pi, (queue->node_vector[i])->key);
-		}
-	}
-	else
-		printf("Heap vazio!\n\n");
+    vertex * vtx;
+    if(!queue)
+        printf("Heap invalido\n");
+    else if(!avl_is_empty(queue))
+    {
+        avl_for_each_element(queue, vtx, h_node)
+        {
+            printf("Elemento %d:\ncost:\t%d\npi:\t%d\n\n", ((vtx_node*)vtx->h_node.key)->key, ((vtx_node*)vtx->h_node.key)->cost, vtx->pi);
+        }
+    }
+    else
+        printf("Heap vazio!\n");
 
-		puts("\n");
-	return;
+    puts("\n");
+}
+
+
+int
+cmp_key(const void *p1, const void *p2) {
+  const vtx_node* ss1, *ss2;
+
+  ss1 = p1;
+  ss2 = p2;
+
+  return memcmp(&(ss1->cost), &(ss2->cost), sizeof(ss1->cost));
 }
 
 

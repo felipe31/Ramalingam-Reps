@@ -48,7 +48,7 @@
 
 #include <stddef.h>
 
-#include "common/common_types.h"
+#include "common_types.h"
 #include "list.h"
 #include "container_of.h"
 
@@ -204,7 +204,7 @@ avl_delete(struct avl_tree *tree, struct avl_node *node) {
  *    larger struct
  * @return pointer to tree element with the specified key,
  *    NULL if no element was found
- */
+ */ // (queue, &g[i].heap_node.key, g, heap_node)
 #define avl_find_element(tree, key, element, node_element) \
   container_of_if_notnull(avl_find(tree, key), typeof(*(element)), node_element)
 

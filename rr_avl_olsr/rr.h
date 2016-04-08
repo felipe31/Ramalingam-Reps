@@ -9,16 +9,14 @@
 
 #define HEAP_SIZE 1000
 
+typedef struct avl_tree heap;
+typedef struct avl_node heap_node;
 
-typedef struct node{
+
+typedef struct vtx_node{
     int cost, key;                      // cost = custo mínimo no caminho mínimo | key = nome do vértice
     char mark;
-} node;                                 // primeiramente usar um vetor
-
-typedef struct heap{
-    node ** node_vector;
-    int control;
-} heap;
+} vtx_node;                                 // primeiramente usar um vetor
 
 typedef struct edge {
     int head_vertex, cost, tail_vertex; // tail -> head
@@ -28,7 +26,7 @@ typedef struct edge {
 } edge;
 
 typedef struct vertex {
-    node heap_node;
+    heap_node h_node;
     int pi;
     edge *adjacent;                     // lista de adjacentes
     edge *predecessor;                  // lista de predecessores
@@ -98,6 +96,9 @@ void heapfy(heap * queue, int i);
 void heap_build(heap * queue);
 
 void heap_print(heap * queue);
+
+int
+cmp_key(const void *p1, const void *p2);
 
 /************************************************************************************************
 *************************************************************************************************
