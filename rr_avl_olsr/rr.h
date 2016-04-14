@@ -8,6 +8,7 @@
 #include "avl.h"
 
 #define HEAP_SIZE 1000
+#define INF (INT_MAX-500)
 
 typedef struct avl_tree heap;
 typedef struct avl_node heap_node;
@@ -91,6 +92,9 @@ int heap_insert(heap_node * node_to_insert, heap * queue);       // Retorna 0 se
 void heap_print(heap * queue);
 
 int cmp_key(const void *p1, const void *p2);
+
+#define heap_is_added(node) \
+    avl_is_node_added(node)
 
 #define heap_is_empty(queue) \
     avl_is_empty(queue)

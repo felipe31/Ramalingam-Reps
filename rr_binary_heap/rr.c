@@ -126,7 +126,7 @@ head_list *rr_mark_affected(vertex *graph, edge *edge_marked)
 	head_list * aux_list = list_new();
 	head_list * affected_list = list_new();
 
-	graph[edge_marked->head_vertex].heap_node.cost = INT_MAX;
+	graph[edge_marked->head_vertex].heap_node.cost = INF;
 	graph[edge_marked->head_vertex].pi = -3;
 	list_insert(aux_list, graph+edge_marked->head_vertex);
 
@@ -144,7 +144,7 @@ head_list *rr_mark_affected(vertex *graph, edge *edge_marked)
 			if(edge_aux->hot_line)
 			{
 				edge_aux->hot_line = 0;
-				graph[edge_aux->head_vertex].heap_node.cost = INT_MAX;
+				graph[edge_aux->head_vertex].heap_node.cost = INF;
 				graph[edge_aux->head_vertex].pi = -3;					// -3 indica que o nó foi afetado e está na lista
 
 				list_insert(aux_list, graph+edge_aux->head_vertex);
@@ -180,7 +180,7 @@ void rr_estimate_new_pi(vertex *graph, head_list *affected_list, heap *queue)
 			}
 			edge_aux = edge_aux->next_pred;
 		}
-		if(vtx->heap_node.cost < INT_MAX)
+		if(vtx->heap_node.cost < INF)
 			heap_insert((node *)vtx, queue);
 	}
 
@@ -318,7 +318,7 @@ vertex *g_create_graph(int size)
 	for (; size > 0; --size)
 	{
 		graph[size-1].heap_node.key = size-1;
-		graph[size-1].heap_node.cost = INT_MAX;
+		graph[size-1].heap_node.cost = INF;
 		graph[size-1].pi = -1;
 
 	}
@@ -340,11 +340,11 @@ void g_print_graph(vertex *graph, int size)
 	for(i = 0; i < size; ++i)
 	{
 		edge_aux = graph[i].adjacent;
-		printf("Vertice\t\t%d\npi:\t\t%d\ncost:\t\t%d\narestas:\t", i, graph[i].pi, graph[i].heap_node.cost);
+		printf("Vertice\t\t%d\npi:\t\t%d\ncost:\t\t%d\narestas:\t", i, graph[i].pi == -3? -1 :graph[i].pi, graph[i].heap_node.cost);
 
 		while(edge_aux)
 		{
-			printf("%d {cost %d, sp %d} - ", edge_aux->head_vertex, edge_aux->cost, edge_aux->hot_line );
+			printf("%d {cost %d} - ", edge_aux->head_vertex, edge_aux->cost);
 			edge_aux = edge_aux->next_adj;
 		}
 

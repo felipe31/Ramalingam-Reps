@@ -1,0 +1,45 @@
+F
+24.74	g_print_graph
+8.42	g_create_graph
+2.31	rr_add_edge
+1.56	heap_new
+0.96	rr_remove_edge
+0.62	rr_mark_affected
+0.42	g_insert_edge
+0.31	list_insert
+0.31	rr_recalculate_shortest_path
+0.28	list_remove
+0.18	g_free_graph
+0.17	heap_insert
+0.12	heap_build
+0.11	rr_estimate_new_pi
+0.09	heapfy
+0.07	list_new
+0.06	find_edge_pred
+0.06	heap_extract
+0.01	heapfy'2
+0.00	find_edge_adj
+0.00	find_pointer_edge_adj
+0.00	find_pointer_edge_pred
+
+D
+35.10	main
+24.74	g_print_graph
+8.38	heapCreateRoot
+1.11	inserir
+0.32	insertEdge
+0.31	dijkstra
+0.31	insertInv
+0.26	remover
+0.15	heapInsert
+0.14	freeInv
+0.14	freeGraph
+0.13	removeEdge
+0.09	afetados
+0.08	initGraph
+0.07	afetados'2
+0.06	heapExtractMin
+0.04	heapDecreaseKey
+0.03	heapFindParentInsertNode
+0.02	removeInv
+0.02	perfectLog2

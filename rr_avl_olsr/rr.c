@@ -34,7 +34,7 @@ void rr_recalculate_shortest_path(vertex *graph, heap *queue)
 
 		while(edge_aux)
 		{
-			if(((vtx_node *)(graph + edge_aux->head_vertex))->mark == 1)
+			if((heap_is_added((heap_node *)(graph + edge_aux->head_vertex))))
 			{
 				if(((vtx_node*)graph[edge_aux->head_vertex].h_node.key)->cost > ((vtx_node*)min->key)->cost + edge_aux->cost )									//relax();
 					heap_update((graph + edge_aux->head_vertex), ((vtx_node*)min->key)->key, ((vtx_node*)min->key)->cost + edge_aux->cost, queue);
@@ -125,7 +125,7 @@ head_list *rr_mark_affected(vertex *graph, edge *edge_marked)
 	head_list * aux_list = list_vtx_new();
 	head_list * affected_list = list_vtx_new();
 
-	((vtx_node*)graph[edge_marked->head_vertex].h_node.key)->cost = INT_MAX;
+	((vtx_node*)graph[edge_marked->head_vertex].h_node.key)->cost = INF;
 	graph[edge_marked->head_vertex].pi = -3;
 	list_vtx_insert(aux_list, graph+edge_marked->head_vertex);
 
@@ -143,7 +143,7 @@ head_list *rr_mark_affected(vertex *graph, edge *edge_marked)
 			if(edge_aux->hot_line)
 			{
 				edge_aux->hot_line = 0;
-				((vtx_node*)graph[edge_aux->head_vertex].h_node.key)->cost = INT_MAX;
+				((vtx_node*)graph[edge_aux->head_vertex].h_node.key)->cost = INF;
 				graph[edge_aux->head_vertex].pi = -3;					// -3 indica que o nó foi afetado e está na lista
 
 				list_vtx_insert(aux_list, graph+edge_aux->head_vertex);
@@ -179,7 +179,7 @@ void rr_estimate_new_pi(vertex *graph, head_list *affected_list, heap *queue)
 			}
 			edge_aux = edge_aux->next_pred;
 		}
-		if(((vtx_node*)vtx->h_node.key)->cost < INT_MAX)
+		if(((vtx_node*)vtx->h_node.key)->cost < INF)
 			heap_insert((heap_node *)vtx, queue);
 	}
 
@@ -321,7 +321,7 @@ vertex *g_create_graph(int size)
 		graph[size-1].h_node.key = calloc(1, sizeof(vtx_node));
         if(!graph[size-1].h_node.key) return NULL;
         ((vtx_node*)graph[size-1].h_node.key)->key = size-1;
-		((vtx_node*)graph[size-1].h_node.key)->cost = INT_MAX;
+		((vtx_node*)graph[size-1].h_node.key)->cost = INF;
 		graph[size-1].pi = -1;
 
 	}
@@ -346,7 +346,7 @@ void g_print_graph(vertex *graph, int size)
 
 		while(edge_aux)
 		{
-			printf("%d {cost %d, sp %d} - ", edge_aux->head_vertex, edge_aux->cost, edge_aux->hot_line );
+			printf("%d {cost %d} - ", edge_aux->head_vertex, edge_aux->cost );
 			edge_aux = edge_aux->next_adj;
 		}
 

@@ -93,7 +93,7 @@ int main(void)
 
 
     g_free_graph(&g, SIZE_G);
-    g_print_graph(g, SIZE_G);
+    //g_print_graph(g, SIZE_G);
 
     return 0;
 }

@@ -7,6 +7,7 @@
 #include <limits.h>
 
 #define HEAP_SIZE 1000
+#define INF (INT_MAX-500)
 
 
 typedef struct node{
