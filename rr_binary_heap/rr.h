@@ -6,7 +6,7 @@
 #include <assert.h>
 #include <limits.h>
 
-#define HEAP_SIZE 1000
+#define HEAP_SIZE 30000
 #define INF (INT_MAX-500)
 
 

@@ -580,42 +580,31 @@ void remover(vertex *vertices, edge **inv, heap *root, int ver, int ori, int des
     }
 }
 
-#define SIZE_G 7
 
 int main(){
 
-    int ori, dest, custo;
-    heap *root = heapCreateRoot();
-    char opt;
+    int size_g, size_edg, source, target, cost;
+    scanf("%d%d", &size_g, &size_edg);
+    if(size_g < 1 || size_edg < 1)
+        return -1;
 
-    vertex *vertices = (vertex*)calloc(SIZE_G, sizeof(vertex));
-    edge **inv = (edge**)calloc(SIZE_G, sizeof(edge*));
-    initGraph(vertices, SIZE_G);
+    heap *root = heapCreateRoot();
+    vertex *vertices = (vertex*)calloc(size_g, sizeof(vertex));
+    edge **inv = (edge**)calloc(size_g, sizeof(edge*));
+    initGraph(vertices, size_g);
 
     vertices[0].heap_node.key = 0;
+
     heapInsert(root, &(vertices[0].heap_node));
 
-    inserir(vertices, inv, root, SIZE_G, 0, 1, 1);
-    inserir(vertices, inv, root, SIZE_G, 0, 5, 1);
-    inserir(vertices, inv, root, SIZE_G, 1, 2, 2);
-    inserir(vertices, inv, root, SIZE_G, 1, 6, 6);
-    inserir(vertices, inv, root, SIZE_G, 2, 3, 2);
-    inserir(vertices, inv, root, SIZE_G, 3, 6, 4);
-    inserir(vertices, inv, root, SIZE_G, 3, 4, 1);
-    inserir(vertices, inv, root, SIZE_G, 4, 5, 2);
-    inserir(vertices, inv, root, SIZE_G, 6, 5, 3);
+    while(scanf("%d%d%d", &source, &target, &cost) != EOF) {
+        inserir(vertices, inv, root, size_g, source, target, cost);
+    }
 
-    g_print_graph(vertices, SIZE_G);
-    remover(vertices, inv, root, SIZE_G, 0, 1);
+    g_print_graph(vertices, size_g);
 
-    g_print_graph(vertices, SIZE_G);
-
-    inserir(vertices, inv, root, SIZE_G, 5, 1, 1);
-
-    g_print_graph(vertices, SIZE_G);
-
-    freeGraph(vertices, SIZE_G);
-    freeInv(inv, SIZE_G);
+    freeGraph(vertices, size_g);
+    freeInv(inv, size_g);
     free(vertices);
     free(inv);
     free(root);
