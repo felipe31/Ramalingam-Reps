@@ -52,7 +52,7 @@ void heap_update(vertex * vtx, int new_pi, int new_cost, heap * queue)
 {
 	vtx->pi = new_pi;
 	((vtx_node*)vtx->h_node.key)->cost = new_cost;
-	heap_build(queue);
+	heap_decrease_key(queue, vtx->h_node.position);
 }
 
 int heap_insert(heap_node * node_to_insert, heap * queue)       // Retorna 0 se o nó foi inserido com sucesso no heap e -1 caso contrário
@@ -62,8 +62,9 @@ int heap_insert(heap_node * node_to_insert, heap * queue)       // Retorna 0 se 
 
 	((vtx_node*)node_to_insert->key)->mark = 1;
 	queue->node_vector[queue->control] = node_to_insert;
+	queue->node_vector[queue->control]->position = queue->control;
 	queue->control++;
-	heap_build(queue);
+	heap_decrease_key(queue, queue->control-1);
 	return 0;
 }
 
@@ -84,18 +85,32 @@ void heapfy(heap * queue, int idx)
 	{
 		aux = queue->node_vector[smallest];
 		queue->node_vector[smallest] = queue->node_vector[idx];
+		queue->node_vector[smallest]->position = smallest;
 		queue->node_vector[idx] = aux;
+		queue->node_vector[idx]->position = idx;
 
 		heapfy(queue, smallest);
 	}
 	return;
 }
 
-void heap_build(heap * queue)
+void heap_decrease_key(heap * queue, int pos)
 {
-	int i;
-	for (i = (queue->control-2)/2; i > -1 ; i--)
-		heapfy(queue, i);
+	int pi  = (queue->control-2)/2 , i;
+	heap_node * aux;
+	while (pos > 0 && ((vtx_node*)queue->node_vector[pos])->cost < ((vtx_node*)queue->node_vector[pi])->cost)
+	{
+		aux = queue->node_vector[pi];
+		queue->node_vector[pi] = queue->node_vector[pos];
+		queue->node_vector[pi]->position = pi;
+
+		queue->node_vector[pos] = aux;
+		queue->node_vector[pos]->position = pos;
+
+		i = pos;
+		pos = pi;
+		pi = (i-2)/2;
+	}
 
 	return;
 }

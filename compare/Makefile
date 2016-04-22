@@ -45,5 +45,5 @@ avl: ../rr_avl_olsr/rr.c ../rr_avl_olsr/rr.h ../rr-D.c
 
 
 clean:
-	rm ./rr_* ./cg.* ./callgrind*
+	-rm ./rr_* ./cg.* ./callgrind*
 #	clear

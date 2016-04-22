@@ -14,7 +14,7 @@ int heap_checks_presence(heap_node * heap_node, heap * queue);               // 
 void heap_update(vertex * vtx, int new_pi, int new_cost, heap * queue);
 int heap_insert(heap_node * node_to_insert, heap * queue);                   // Retorna 0 se o nó foi inserido com sucesso no heap e 1 caso contrário
 void heapfy(heap * queue, int i);
-void heap_build(heap * queue);
+void heap_decrease_key(heap * queue, int pos);
 void heap_print(heap * queue);
 
 

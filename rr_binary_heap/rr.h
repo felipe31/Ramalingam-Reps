@@ -10,11 +10,13 @@
                                         // Instruction misses - cache misses TODO
 typedef struct heap_node{
     void * key;
+    int position;
 } heap_node;
 
 typedef struct vtx_node{
     int cost, key;                                                      // cost = custo mínimo no caminho mínimo | key = nome do vértice
     char mark;
+    int pi;
 } vtx_node;                                                                 // primeiramente usar um vetor
 
 typedef struct heap{
