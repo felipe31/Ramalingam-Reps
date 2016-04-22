@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <string.h>
 #include "heap.h"
 #include "graph.h"
 #include "rr.h"
@@ -49,8 +49,8 @@ void rr_recalculate_shortest_path(vertex *graph, heap *queue)
 }
 
 
-void rr_add_edge(vertex *graph, int tail, int head, int cost, heap * queue){
-	if(!graph || !queue) return;
+void rr_add_edge(vertex *graph, int tail, int head, int cost){
+	if(!graph) return;
 
 	edge * edge_added = g_insert_edge(graph, tail, head, cost);
 
@@ -69,9 +69,9 @@ void rr_add_edge(vertex *graph, int tail, int head, int cost, heap * queue){
 
 
 
-void rr_remove_edge(vertex *graph, int tail, int head, heap * queue)
+void rr_remove_edge(vertex *graph, int tail, int head)
 {
-	if(!queue || !graph || tail < 0 || head < 0) return;
+	if(!queue) return;
 
 	edge * edge_removed = find_edge_adj(graph+tail, head);
 	edge ** edge_adj = find_pointer_edge_adj(graph+tail, edge_removed );
@@ -81,7 +81,7 @@ void rr_remove_edge(vertex *graph, int tail, int head, heap * queue)
 	*edge_adj = edge_removed->next_adj;
 	*edge_pred = edge_removed->next_pred;
 
-	if(graph[edge_removed->head_vertex].pi != edge_removed->tail_vertex)
+	if(edge_removed->hot_line == 0)
 	{
 		free(edge_removed);
 		return;
@@ -118,7 +118,7 @@ head_list *rr_mark_affected(vertex *graph, edge *edge_marked)
 		edge_aux = vtx->adjacent;
 		while(edge_aux)
 		{
-			if(graph[edge_aux->head_vertex].pi == edge_aux->tail_vertex)
+			if(edge_aux->hot_line)
 			{
 				((vtx_node*)graph[edge_aux->head_vertex].h_node.key)->cost = INF;
 				graph[edge_aux->head_vertex].pi = -3;					// -3 indica que o nó foi afetado e está na lista
@@ -127,10 +127,10 @@ head_list *rr_mark_affected(vertex *graph, edge *edge_marked)
 			}
 			edge_aux = edge_aux->next_adj;
 		}
+
 	}
 	return affected_list;
 }
-
 void rr_estimate_new_pi(vertex *graph, head_list *affected_list, heap *queue)
 {
 	if(!graph || !affected_list || !queue) return;
@@ -179,7 +179,7 @@ edge ** find_pointer_edge_adj(vertex *tail, edge *edge_ref)
 		{
 			break;
 		}
-		else if(edge_p->next_adj == NULL)
+		else if(edge_p->next_adj)
 		{
 			return NULL;
 		}
@@ -194,7 +194,7 @@ edge ** find_pointer_edge_pred(vertex *head, edge *edge_ref)
 {
 	edge * edge_p = head->predecessor;
 
-	if(edge_p == NULL)
+	if(!edge_p)
 		return NULL;
 
 	if(edge_p == edge_ref)
@@ -206,7 +206,7 @@ edge ** find_pointer_edge_pred(vertex *head, edge *edge_ref)
 		{
 			break;
 		}
-		else if(edge_p->next_pred == NULL)
+		else if(!edge_p->next_pred)
 		{
 			return NULL;
 		}
@@ -222,14 +222,14 @@ edge * find_edge_adj(vertex * tail, int key)
 {
 	edge * edge_adj = tail->adjacent;
 
-	if(edge_adj == NULL)
+	if(!edge_adj)
 		return NULL;
 
 	while(edge_adj->head_vertex != key)
 	{
 		edge_adj = edge_adj->next_adj;
 
-		if(edge_adj == NULL)
+		if(!edge_adj)
 			return NULL;
 	}
 
@@ -240,14 +240,14 @@ edge * find_edge_pred(vertex * head, int key)
 {
 	edge * edge_pred = head->predecessor;
 
-	if(edge_pred == NULL || key == -1)
+	if(!edge_pred || key == -1)
 		return NULL;
 
 	while(edge_pred->tail_vertex != key)
 	{
 		edge_pred = edge_pred->next_pred;
 
-		if(edge_pred == NULL)
+		if(!edge_pred)
 			return NULL;
 	}
 
@@ -270,7 +270,7 @@ list * list_vtx_insert(head_list * h_list, vertex * v_list)
 {
 	if(!h_list || !v_list) return NULL;
 
-	list * l = (list *) malloc(sizeof(list));
+	list * l = (list *) calloc(1, sizeof(list));
 	if(l)
 	{
 		l->vtx = v_list;
@@ -279,7 +279,7 @@ list * list_vtx_insert(head_list * h_list, vertex * v_list)
 		else
 			h_list->first = l;
 		h_list -> last = l;
-		l->next = NULL;
+
 	}
 	return l;
 }

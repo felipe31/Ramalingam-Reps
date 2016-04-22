@@ -29,7 +29,7 @@ all:
 
 bh: ../rr_binary_heap/rr.c ../rr_binary_heap/rr.h ../rr-D.c
 	@echo 'Comparing rr with vector binary heap and rr with dynamic binary heap'
-	$(eval FILES1 := ../rr_binary_heap/main.c ../rr_binary_heap/rr.c)
+	$(eval FILES1 := ../rr_binary_heap/main.c ../rr_binary_heap/rr.c ../rr_binary_heap/heap.c ../rr_binary_heap/graph.c)
 	$(eval FILES2 := ../rr-D.c)
 	$(eval CMP1 := rr_bh_F)
 	$(eval CMP2 := rr_bh_D)
@@ -37,7 +37,7 @@ bh: ../rr_binary_heap/rr.c ../rr_binary_heap/rr.h ../rr-D.c
 
 avl: ../rr_avl_olsr/rr.c ../rr_avl_olsr/rr.h ../rr-D.c
 	@echo 'Comparing rr with avl from olsr and rr with dynamic binary heap'
-	$(eval FILES1 := ../rr_avl_olsr/main.c ../rr_avl_olsr/rr.c ../rr_avl_olsr/avl.c)
+	$(eval FILES1 := ../rr_avl_olsr/main.c ../rr_avl_olsr/rr.c ../rr_avl_olsr/heap.c ../rr_avl_olsr/graph.c ../rr_avl_olsr/avl.c)
 	$(eval FILES2 := ../rr-D.c)
 	$(eval CMP1 := rr_avl_F)
 	$(eval CMP2 := rr_bh_avl_D)

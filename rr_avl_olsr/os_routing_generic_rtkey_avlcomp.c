@@ -44,7 +44,7 @@
  */
 
 #include "common_types.h"
-
+#include <string.h>
 //#include "subsystems/os_routing.h"
 
 /**
