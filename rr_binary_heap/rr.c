@@ -31,7 +31,7 @@ void rr_recalculate_shortest_path(vertex *graph, heap *queue)
 			if((heap_is_added((heap_node *)(graph + edge_aux->head_vertex))))
 			{
 				if(((vtx_node*)graph[edge_aux->head_vertex].h_node.key)->cost > ((vtx_node*)min->key)->cost + edge_aux->cost )									//relax();
-					heap_update((graph + edge_aux->head_vertex), ((vtx_node*)min->key)->key, ((vtx_node*)min->key)->cost + edge_aux->cost, queue);
+					heap_update(&((graph + edge_aux->head_vertex)->h_node), ((vtx_node*)min->key)->cost + edge_aux->cost, queue);
 			}
 			else
 			{

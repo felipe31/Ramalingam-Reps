@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <limits.h>
-#include <heap.h>
+#include "heap.h"
 
 #define INF (INT_MAX-500)
                                         // Instruction misses - cache misses TODO

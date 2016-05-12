@@ -8,7 +8,7 @@
 int n_ver;
 
 typedef heap_node node;
-typedef (vtx_node *) keyType;
+typedef vtx_node* keyType;
 
 typedef struct edge{
     int head_vertex, cost;
@@ -35,7 +35,7 @@ heap* heapCreateRoot(){
 
 
 void heapDecreaseKey(heap *root, node *h_node, int new_cost){
-    heap_update(h_node, vtx, -4, new_cost, root);
+    heap_update(h_node, new_cost, root);
 }
 
 void heapInsert(heap *root, node *new_node){
@@ -43,11 +43,11 @@ void heapInsert(heap *root, node *new_node){
 }
 
 void heapIncreseKey(heap *root, node *h_node, int new_cost){
-    heap_update(h_node, vtx, -4, new_cost, root);
+    heap_update(h_node, new_cost, root);
 }
 
 node *heapExtractMin(heap *root){
-    return heap_extract(heap * queue);
+    return heap_extract(root);
 }
 
 /************************************************************************************************
@@ -61,12 +61,14 @@ void initGraph(vertex *vertices, int size){
     int i;
     vertices[0].pi = -2;
     vertices[0].adjacent = NULL;
+    vertices[0].h_node.key = (vtx_node*) malloc(sizeof(vtx_node));
     ((vtx_node*)vertices[0].h_node.key)->cost = -1;
     ((vtx_node*)vertices[0].h_node.key)->key = 0;
     vertices[0].cost = 0;
     for(i=1; i<size; i++) {
         vertices[i].pi = -1;
         vertices[i].adjacent = NULL;
+        vertices[i].h_node.key = (vtx_node*) malloc(sizeof(vtx_node));
         ((vtx_node*)vertices[i].h_node.key)->cost = -1;
         ((vtx_node*)vertices[i].h_node.key)->key = i;
         vertices[i].cost = INF;
@@ -197,7 +199,7 @@ void g_print_graph(vertex *graph, int size) {
 	}
 	puts("\n");
 }
-
+/*
 void printGraph(vertex *vertices, int ver){
     int i;
     edge *aux;
@@ -216,15 +218,15 @@ void printGraph(vertex *vertices, int ver){
         }
     }
 }
-
+*/
 void dijkstra(vertex *vertices, heap *root){
     int min_vertex, old_cost, new_cost, adjacent;
     //printGraph(vertices, n_ver);
     node *min_node;
-    while(root->root_node){
+    while(!heap_is_empty(root)){
         min_node = heapExtractMin(root);
-        min_vertex = min_node->vertex;
-        vertices[min_vertex].h_node.key = -1;
+        min_vertex = ((vtx_node*)min_node->key)->key;
+        ((vtx_node*)vertices[min_vertex].h_node.key)->cost = -1;
         //printf("\nmin_vertex: %d\n", min_vertex);
         edge *aux = vertices[min_vertex].adjacent;
         while(aux){
@@ -232,8 +234,8 @@ void dijkstra(vertex *vertices, heap *root){
             new_cost = vertices[min_vertex].cost + aux->cost;
                 //printf("new_cost: %d\tadjacent: %d\n", new_cost, adjacent);
             if(new_cost < vertices[adjacent].cost){
-                if(vertices[adjacent].h_node.key == -1){
-                    vertices[adjacent].h_node.key = new_cost;
+                if(((vtx_node*)vertices[adjacent].h_node.key)->cost == -1){
+                    ((vtx_node*)vertices[adjacent].h_node.key)->cost = new_cost;
                     heapInsert(root, &(vertices[adjacent].h_node));
                 }
                 else{
@@ -272,7 +274,7 @@ void inserir(vertex *vertices, edge **inv, heap *root, int ver, int ori, int des
         //resetaGrafo(vertices, ver);
         vertices[dest].cost = vertices[ori].cost + custo;
         vertices[dest].pi = ori;
-        vertices[dest].h_node.key = vertices[dest].cost;
+        ((vtx_node*)vertices[dest].h_node.key)->cost = vertices[dest].cost;
         heapInsert(root, &(vertices[dest].h_node));
         dijkstra(vertices, root);
     }
@@ -292,8 +294,8 @@ void afetados(vertex *vertices, edge **inv, heap *root, int ver, int afetado) {
     aux = inv[afetado];
     while(aux){
         if(vertices[aux->head_vertex].cost != INF){
-            if(vertices[aux->head_vertex].h_node.key == -1){
-                vertices[aux->head_vertex].h_node.key = vertices[aux->head_vertex].cost;
+            if(((vtx_node*)vertices[aux->head_vertex].h_node.key)->cost == -1){
+                ((vtx_node*)vertices[aux->head_vertex].h_node.key)->cost = vertices[aux->head_vertex].cost;
                 heapInsert(root, &(vertices[aux->head_vertex].h_node));
                 //printf("count: %d\troot_node: %p\tlast_node: %p\n", root->count, root->root_node, root->last_node);
                 //heapPrint(root->root_node);
@@ -325,7 +327,8 @@ int main(){
     edge **inv = (edge**)calloc(size_g, sizeof(edge*));
     initGraph(vertices, size_g);
 
-    vertices[0].h_node.key = 0;
+    ((vtx_node*)vertices[0].h_node.key)->key = 0;
+    ((vtx_node*)vertices[0].h_node.key)->cost = 0;
 
     heapInsert(root, &(vertices[0].h_node));
 
