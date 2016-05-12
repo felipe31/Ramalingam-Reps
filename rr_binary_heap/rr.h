@@ -5,25 +5,10 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <limits.h>
+#include <heap.h>
 
 #define INF (INT_MAX-500)
                                         // Instruction misses - cache misses TODO
-typedef struct heap_node{
-    void * key;
-    int position;
-} heap_node;
-
-typedef struct vtx_node{
-    int cost, key;                                                      // cost = custo mínimo no caminho mínimo | key = nome do vértice
-    char mark;
-    int pi;
-} vtx_node;                                                                 // primeiramente usar um vetor
-
-typedef struct heap{
-    heap_node ** node_vector;
-    int control;
-} heap;
-
 typedef struct edge {
     int head_vertex, cost, tail_vertex; // tail -> head
     struct edge *next_pred;             // prox na lista de predecessores
