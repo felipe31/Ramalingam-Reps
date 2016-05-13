@@ -37,7 +37,13 @@ typedef struct vertex{
 ****************************** ALGORITMOS DE MANIPULAÇÃO DO HEAP *******************************
 *************************************************************************************************
 ************************************************************************************************/
-
+void heapPrint(node *root){
+    if(root){
+        printf("%d\n", root->key);
+        heapPrint(root->left);
+        heapPrint(root->right);
+    }
+}
 heap* heapCreateRoot(){
     heap *new_heap = (heap*)malloc(sizeof(heap));
     new_heap->count = 0;

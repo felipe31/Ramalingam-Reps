@@ -9,22 +9,22 @@
 #include "heap.h"
 #include "rr.h"
 
+heap * ROOT;
+
 heap * heap_new()
 {
-	struct avl_tree * _routing_tree = (struct avl_tree *) calloc(1, sizeof(struct avl_tree));
-
-	if(!_routing_tree) return NULL;
-
-	avl_init(_routing_tree, cmp_key, false);
-	return _routing_tree;
+	heap * root = (struct heap_root *) calloc(1, sizeof(struct heap_root));
+	ROOT = root;
+	if(!root) return NULL;
+	heap_init(root, cmp_key);
+	return root;
 }
 
 
 int heap_insert(heap_node * node_to_insert, heap * queue)       // Retorna 0 se o nó foi inserido com sucesso no heap e -1 caso contrário
 {
 	if(!queue || !node_to_insert) return -1;
-
-	avl_insert(queue, node_to_insert);
+	_heap_insert(queue, node_to_insert);
 	return 0;
 }
 
@@ -32,31 +32,23 @@ int heap_insert(heap_node * node_to_insert, heap * queue)       // Retorna 0 se 
 heap_node * heap_extract(heap * queue)
 {
 	if(!queue) return NULL;
-
-    vertex *vtx;
-    vtx = (vertex *) avl_first_element_safe(queue, vtx, h_node);
-
-    if(!vtx) return NULL;
-
-    avl_remove(queue, &(vtx->h_node));
-
-	return &(vtx->h_node);
+	return heap_extract_min(queue);
 }
 
 
 void heap_update(heap_node * node, int new_cost, heap * queue)
 {
-    avl_remove(queue, node);
-    ((vtx_node *)node->key)->cost = new_cost;
-    avl_insert(queue,node);
+	if(!queue || !node) return;
+	((vtx_node *)node->key)->cost = new_cost;
+	heap_decrease_key(queue, node);
 }
-
+/*
 void heap_print(heap * queue)
 {
     vertex * vtx;
     if(!queue)
         printf("Heap invalido\n");
-    else if(!avl_is_empty(queue))
+    else if(!heap_is_empty(queue))
     {
         avl_for_each_element(queue, vtx, h_node)
         {
@@ -68,7 +60,11 @@ void heap_print(heap * queue)
 
     puts("\n");
 }
-
+*/
+int heap_is_added(heap_node * node)
+{
+    heap_is_node_added(ROOT, node);
+}
 
 int
 cmp_key(const void *p1, const void *p2) {

@@ -5,15 +5,17 @@
 ************************************************************************************************/
 #ifndef _HEAP_
 #define _HEAP_
-#include "avl.h"
+#include "heap_olsr.h"
 
 
-typedef struct avl_tree heap;
-typedef struct avl_node heap_node;
+typedef struct heap_root heap;
+typedef struct heap_node heap_node;
 
 typedef struct vtx_node{
-    int cost, key;                      // cost = custo mínimo no caminho mínimo | key = nome do vértice
-} vtx_node;
+    int cost, key;                                                      // cost = custo mínimo no caminho mínimo | key = nome do vértice
+    char mark;
+    int pi;
+} vtx_node;  
 
 
 
@@ -25,10 +27,9 @@ void heap_print(heap * queue);
 
 int cmp_key(const void *p1, const void *p2);
 
-#define heap_is_added(node) \
-    avl_is_node_added(node)
+int heap_is_added(heap_node * node);
 
 #define heap_is_empty(queue) \
-    avl_is_empty(queue)
+    heap_is_empty(queue)
 
 #endif

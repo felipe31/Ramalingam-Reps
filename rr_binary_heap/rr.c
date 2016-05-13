@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 #include "heap.h"
 #include "graph.h"
 #include "rr.h"
@@ -30,8 +29,11 @@ void rr_recalculate_shortest_path(vertex *graph, heap *queue)
 		{
 			if((heap_is_added((heap_node *)(graph + edge_aux->head_vertex))))
 			{
-				if(((vtx_node*)graph[edge_aux->head_vertex].h_node.key)->cost > ((vtx_node*)min->key)->cost + edge_aux->cost )									//relax();
+				if(((vtx_node*)graph[edge_aux->head_vertex].h_node.key)->cost > ((vtx_node*)min->key)->cost + edge_aux->cost )
+				{									//relax();
+					(graph + edge_aux->head_vertex)->pi = ((vtx_node*)min->key)->key;
 					heap_update(&((graph + edge_aux->head_vertex)->h_node), ((vtx_node*)min->key)->cost + edge_aux->cost, queue);
+				}
 			}
 			else
 			{

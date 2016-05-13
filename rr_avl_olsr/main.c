@@ -2,7 +2,7 @@
 #include "rr.h"
 #include "graph.h"
 #include "avl.h"
-// 
+
 // int main(void)
 // {
 //
@@ -24,6 +24,7 @@
 //     g_print_graph(g, size_g);
 //
 //     g_free_graph(&g, size_g);
+//     free(queue);
 //
 //     return 0;
 // }
