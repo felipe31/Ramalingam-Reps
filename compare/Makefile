@@ -106,3 +106,4 @@ bh2_avl:
 clean:
 	-rm ./rr_* ./cg.* ./callgrind*
 #	clear
+#valgrind --tool=memcheck --leak-check=yes -v
