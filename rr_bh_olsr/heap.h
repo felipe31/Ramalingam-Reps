@@ -15,7 +15,7 @@ typedef struct vtx_node{
     int cost, key;                                                      // cost = custo mínimo no caminho mínimo | key = nome do vértice
     char mark;
     int pi;
-} vtx_node;  
+} vtx_node;
 
 
 

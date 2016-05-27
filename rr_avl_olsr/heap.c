@@ -15,7 +15,7 @@ heap * heap_new()
 
 	if(!_routing_tree) return NULL;
 
-	avl_init(_routing_tree, cmp_key, false);
+	avl_init(_routing_tree, cmp_key, true);
 	return _routing_tree;
 }
 

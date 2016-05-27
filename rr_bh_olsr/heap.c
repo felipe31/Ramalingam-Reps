@@ -63,7 +63,7 @@ void heap_print(heap * queue)
 */
 int heap_is_added(heap_node * node)
 {
-    heap_is_node_added(ROOT, node);
+    return heap_is_node_added(ROOT, node);
 }
 
 int

@@ -10,7 +10,7 @@ void g_free_graph(vertex **graph, int size)
 	if(!(*graph) || size < 1) return;
 	int i;
 	edge * edge_aux;
-    heap_node * node;
+	heap_node * node;
 
 	for (i = 0; i < size; i++)
 	{
@@ -22,8 +22,8 @@ void g_free_graph(vertex **graph, int size)
 			edge_aux = (*graph)[i].adjacent;
 		}
 
-        node = (heap_node *)((*graph)[i].h_node.key);
-        free(node);
+		node = (heap_node *)((*graph)[i].h_node.key);
+		free(node);
 	}
 	free(*graph);
 	*graph = NULL;
@@ -33,21 +33,25 @@ vertex *g_create_graph(int size)
 {
 	if(size < 1) return NULL;
 
-	vertex * graph = (vertex *) calloc(size, sizeof(vertex));
+	vertex * graph = (vertex *) malloc(size*sizeof(vertex));
 	if(!graph) return NULL;
 
 	for (; size > 0; --size)
 	{
-		graph[size-1].h_node.key = calloc(1, sizeof(vtx_node));
-        if(!graph[size-1].h_node.key) return NULL;
-        ((vtx_node*)graph[size-1].h_node.key)->key = size-1;
+		graph[size-1].h_node.key = (vtx_node*)malloc(sizeof(vtx_node));
+		if(!graph[size-1].h_node.key) return NULL;
+		((vtx_node*)graph[size-1].h_node.key)->key = size-1;
 		((vtx_node*)graph[size-1].h_node.key)->cost = INF;
+		((vtx_node*)graph[size-1].h_node.key)->mark = 0;
 		graph[size-1].pi = -1;
+		graph[size-1].adjacent = NULL;
+		graph[size-1].predecessor = NULL;
 
 	}
 
 	return graph;
 }
+
 void g_print_graph(vertex *graph, int size)
 {
 
@@ -66,7 +70,7 @@ void g_print_graph(vertex *graph, int size)
 
 		while(edge_aux)
 		{
-			printf("%d {cost %d} - ", edge_aux->head_vertex, edge_aux->cost );
+			printf("%d {cost %d} - ", edge_aux->head_vertex, edge_aux->cost);
 			edge_aux = edge_aux->next_adj;
 		}
 
@@ -81,7 +85,7 @@ edge * g_insert_edge(vertex *graph, int tail, int head, int cost)
 {
 	if(!graph) return NULL;
 
-	edge * edge_added = (edge *) calloc(1, sizeof(edge));
+	edge * edge_added = (edge *) malloc(sizeof(edge));
 
 	if(edge_added)
 	{
